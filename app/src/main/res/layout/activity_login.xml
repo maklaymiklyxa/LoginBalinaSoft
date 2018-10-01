@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg"
     android:id="@+id/logView">
 
@@ -41,7 +40,9 @@
         android:fontFamily="@font/helveticaneuecyr_medium"
         android:hint="@string/emailHint"
         android:textSize="16sp"
-        />
+        android:maxLines="1"
+        android:inputType="text"
+        android:imeOptions="actionNext"/>
 
     <TextView
         android:id="@+id/passTitle"
@@ -71,7 +72,8 @@
         android:inputType="textPassword"
         android:textSize="16sp"
         android:maxLength="10"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:imeOptions="actionDone"/>
 
     <CheckBox
         android:id="@+id/showPass"
@@ -101,7 +103,5 @@
         android:fontFamily="@font/helveticaneuecyr_medium"
         android:text="@string/signUp"
         android:textSize="16sp" />
-
-
 
 </RelativeLayout>
