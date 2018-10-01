@@ -12,5 +12,8 @@
         <item name="android:textColorHint">@color/colorHint</item>
 
     </style>
+    <style name="TextAppearance">
+        <item name="android:fontFamily">@font/font_family</item>
+    </style>
 
 </resources>

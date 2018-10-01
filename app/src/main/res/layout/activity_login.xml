@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/logView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
-    android:id="@+id/logView">
+    android:background="@drawable/bg">
 
     <ImageView
         android:id="@+id/imageView"
@@ -19,30 +19,33 @@
     <TextView
         android:id="@+id/emailTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="16sp"
         android:layout_alignStart="@+id/emailAutoComplete"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="217dp"
-        android:fontFamily="@font/helveticaneuecyr_medium"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="221dp"
         android:text="@string/e_mail"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance"
+        android:textSize="14sp"
+        android:textStyle="italic" />
 
-    <AutoCompleteTextView
+    <android.support.v7.widget.AppCompatAutoCompleteTextView
         android:id="@+id/emailAutoComplete"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="237dp"
         android:layout_marginEnd="20dp"
-        android:fontFamily="@font/helveticaneuecyr_medium"
+        android:gravity="top"
         android:hint="@string/emailHint"
-        android:textSize="16sp"
-        android:maxLines="1"
+        android:imeOptions="actionNext"
         android:inputType="text"
-        android:imeOptions="actionNext"/>
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance"
+        android:textSize="14sp"
+        android:textStyle="normal" />
 
     <TextView
         android:id="@+id/passTitle"
@@ -51,29 +54,31 @@
         android:layout_below="@+id/emailAutoComplete"
         android:layout_alignStart="@+id/emailTitle"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/helveticaneuecyr_roman"
+        android:layout_marginTop="13dp"
         android:text="@string/pass"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance"
+        android:textSize="14sp"
+        android:textStyle="italic" />
 
     <EditText
         android:id="@+id/passEnter"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="316dp"
         android:layout_marginEnd="20dp"
         android:ems="10"
-        android:fontFamily="@font/helveticaneuecyr_medium"
+        android:gravity="top"
         android:hint="@string/passHint"
+        android:imeOptions="actionDone"
         android:inputType="textPassword"
-        android:textSize="16sp"
         android:maxLength="10"
         android:maxLines="1"
-        android:imeOptions="actionDone"/>
+        android:textAppearance="@style/TextAppearance"
+        android:textSize="14sp"
+        android:textStyle="normal" />
 
     <CheckBox
         android:id="@+id/showPass"
@@ -96,12 +101,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="19dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="379dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/button_background"
-        android:fontFamily="@font/helveticaneuecyr_medium"
         android:text="@string/signUp"
-        android:textSize="16sp" />
+        android:textAppearance="@style/TextAppearance"
+        android:textSize="16sp"
+        android:textStyle="normal" />
 
 </RelativeLayout>
