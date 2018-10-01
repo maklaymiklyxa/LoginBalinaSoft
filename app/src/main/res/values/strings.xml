@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Login</string>
+    <string name="e_mail">Email</string>
+    <string name="pass">Password</string>
+    <string name="balina">BalinaSoftTestApp</string>
+    <string name="emailHint">email@somedomain.com</string>
+    <string name="passHint">enter password</string>
+    <string name="signUp">Sign Up</string>
 </resources>
