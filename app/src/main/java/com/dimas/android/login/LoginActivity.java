@@ -229,7 +229,7 @@ public class LoginActivity extends AppCompatActivity {
     public void sendPostOkHttp() {
         JSONObject jo = new JSONObject();
         try {
-            jo.put("login", "zxcvbnmdsafsff7747474");
+            jo.put("login", "zxcvbnmdsafsff7747474terwerw");
             jo.put("password", mPassText.getText().toString());
 
         } catch (JSONException e) {
@@ -251,7 +251,7 @@ public class LoginActivity extends AppCompatActivity {
     private void sendPostRetrofit() {
         JSONObject paraObject = new JSONObject();
         try {
-            paraObject.put("login", "131w74rewre54454weqwee3211r2uu");
+            paraObject.put("login", "131w74rewre54454weqwee3rew4242msmfsd");
             paraObject.put("password", mPassText.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
