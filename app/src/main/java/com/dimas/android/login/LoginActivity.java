@@ -19,14 +19,27 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.dimas.android.login.data.model.Post;
+import com.dimas.android.login.data.remote.APIService;
+import com.dimas.android.login.data.remote.ApiUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
+    private APIService mAPIService;
     String[] domains = new String[]{
             /* Default domains included */
             "aol.com", "att.net", "comcast.net", "facebook.com", "gmail.com", "gmx.com", "googlemail.com",
@@ -89,7 +102,8 @@ public class LoginActivity extends AppCompatActivity {
     );
 
 
-    ArrayList<String> list;
+    private ArrayList<String> list;
+    private String postUrl = "http://junior.balinasoft.com/api/account/signup";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +113,8 @@ public class LoginActivity extends AppCompatActivity {
         mPassText = (EditText) findViewById(R.id.passEnter);
         mSignBtn = (Button) findViewById(R.id.logIn);
         mShowPass = (CheckBox) findViewById(R.id.showPass);
+
+        mAPIService = ApiUtils.getApiService();
 
         mEmailComplite.addTextChangedListener(new TextWatcher() {
             @Override
@@ -148,11 +164,59 @@ public class LoginActivity extends AppCompatActivity {
         mSignBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isOk && validatePass(mPassText.getText().toString())) {
-                    return;
-                }
+//                if (isOk && validatePass(mPassText.getText().toString())) {
+                    //sendPost(mEmailComplite.getText().toString(), mPassText.getText().toString());
+//                }
+                sendPostRq();
+                //sendPost("rwr","erww");
             }
         });
+    }
+
+    public void sendPostRq(){
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put("login", "yourmailrrrrrrrrrr");
+            jo.put("password","passwordrrrrrrrrttt");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        PostOkHttp t = new PostOkHttp(postUrl,  jo.toString());
+        t.execute(postUrl);
+    }
+    private void sendPost(String email, String password) {
+        try {
+            JSONObject paraObject = new JSONObject();
+            try {
+                paraObject.put("login","trerewrrrqew");
+                paraObject.put("password", "444444444444444444432errew");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mAPIService.savePost(paraObject.getString("login"),paraObject.getString("password")).enqueue(new Callback<Post>() {
+                @Override
+                public void onResponse(Call<Post> call, Response<Post> response) {
+                    if (response.code()==200) {
+                        Toast.makeText(LoginActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        try {
+                            JSONObject jObjError = new JSONObject(response.errorBody().string());
+                            Toast.makeText(LoginActivity.this, jObjError.getString("message"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Post> call, Throwable t) {
+
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void completeEmail(Editable s) {
@@ -184,7 +248,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             String postfix = str.substring(atSignPosition + 1, s.length());
             if (!isDomainValid(postfix)) {
-                mEmailComplite.setError("Check your domain name");
+                mEmailComplite.setError("Check your domain name. You can only use letters and periods (‘.’) in your domain.");
             } else {
                 if (isNetworkAvailable()) {
                     NetworkUrl networkUrl = new NetworkUrl();
@@ -230,8 +294,8 @@ public class LoginActivity extends AppCompatActivity {
             mPassText.setError("Field can't be empty");
             return false;
         }
-        if (mPassText.length() < 5) {
-            mPassText.setError("Enter 5 or more symbols");
+        if (mPassText.length() < 8) {
+            mPassText.setError("Enter 8 or more symbols");
             return false;
         } else {
             mPassText.setError(null);
