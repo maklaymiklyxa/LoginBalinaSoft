@@ -4,26 +4,27 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Post {
-    @SerializedName("login")
+    @SerializedName("status")
     @Expose
-    private String login;
-    @SerializedName("password")
+    private Integer status;
+    @SerializedName("data")
     @Expose
-    private String password;
+    private Data data;
 
-    public String getLogin() {
-        return login;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public String getPassword() {
-        return password;
+    public Data getData() {
+        return data;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setData(Data data) {
+        this.data = data;
     }
+
 }

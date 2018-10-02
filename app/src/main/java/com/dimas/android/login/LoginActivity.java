@@ -2,9 +2,11 @@ package com.dimas.android.login;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
@@ -12,18 +14,24 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dimas.android.login.data.model.Post;
 import com.dimas.android.login.data.remote.APIService;
 import com.dimas.android.login.data.remote.ApiUtils;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +47,6 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private APIService mAPIService;
     String[] domains = new String[]{
             /* Default domains included */
             "aol.com", "att.net", "comcast.net", "facebook.com", "gmail.com", "gmx.com", "googlemail.com",
@@ -81,11 +88,11 @@ public class LoginActivity extends AppCompatActivity {
             "hotmail.com", "yahoo.com.mx", "live.com.mx", "yahoo.com", "hotmail.es", "live.com", "hotmail.com.mx", "prodigy.net.mx", "msn.com"
     };
 
-    private String str;
     private AppCompatAutoCompleteTextView mEmailComplite;
     private Button mSignBtn;
     private EditText mPassText;
     private CheckBox mShowPass;
+    private APIService mAPIService;
 
     private boolean isOk = false;
 
@@ -103,19 +110,28 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private ArrayList<String> list;
-    private String postUrl = "http://junior.balinasoft.com/api/account/signup";
+    private String strPrefix = null;
+    private static final String KEY_INDEX_EMAIL = "email";
+    private static final String KEY_PASSWORD = "pass";
+    private static final String KEY_ISOK = "isok";
+    private static final String KEY_PREFIX = "prefix";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        if (savedInstanceState != null) {
+            mEmailComplite.setText(savedInstanceState.getString(KEY_INDEX_EMAIL));
+            mPassText.setText(savedInstanceState.getString(KEY_INDEX_EMAIL));
+            isOk = savedInstanceState.getBoolean(KEY_ISOK);
+            strPrefix = savedInstanceState.getString(KEY_PREFIX);
+        }
         mEmailComplite = (AppCompatAutoCompleteTextView) findViewById(R.id.emailAutoComplete);
         mPassText = (EditText) findViewById(R.id.passEnter);
         mSignBtn = (Button) findViewById(R.id.logIn);
         mShowPass = (CheckBox) findViewById(R.id.showPass);
-
         mAPIService = ApiUtils.getApiService();
-
         mEmailComplite.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -148,6 +164,18 @@ public class LoginActivity extends AppCompatActivity {
                 validatePass(s.toString());
             }
         });
+        mPassText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    mSignBtn.callOnClick();
+                    return true;
+                }
+                return false;
+            }
+        });
         mShowPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -164,108 +192,147 @@ public class LoginActivity extends AppCompatActivity {
         mSignBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (isOk && validatePass(mPassText.getText().toString())) {
-                    //sendPost(mEmailComplite.getText().toString(), mPassText.getText().toString());
-//                }
-                sendPostRq();
-                //sendPost("rwr","erww");
+                if (mEmailComplite.getText().toString().isEmpty()) {
+                    mEmailComplite.setError("Please input email!");
+                    isOk = false;
+                }
+                if (isOk & validatePass(mPassText.getText().toString())) {
+                    if (isNetworkAvailable()) {
+                        sendPostOkHttp();
+                        sendPostRetrofit();
+                        mEmailComplite.setText("");
+                        mEmailComplite.setError(null);
+                        mPassText.setText("");
+                        mPassText.setError(null);
+                        isOk = false;
+                        Toast.makeText(LoginActivity.this,"Registration done",Toast.LENGTH_SHORT).show();
+                    } else {
+                        new android.app.AlertDialog.Builder(LoginActivity.this)
+                                .setTitle("Network needed")
+                                .setMessage("This app needs any network connection!")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        return;
+                                    }
+                                })
+                                .create()
+                                .show();
+                    }
+                } else {
+                    validatePass(mPassText.getText().toString());
+                }
             }
         });
     }
 
-    public void sendPostRq(){
+    public void sendPostOkHttp() {
         JSONObject jo = new JSONObject();
         try {
-            jo.put("login", "yourmailrrrrrrrrrr");
-            jo.put("password","passwordrrrrrrrrttt");
+            jo.put("login", "zxcvbnmdsafsff7747474");
+            jo.put("password", mPassText.getText().toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        PostOkHttp t = new PostOkHttp(postUrl,  jo.toString());
-        t.execute(postUrl);
+        PostOkHttp t = new PostOkHttp(jo.toString());
+        t.execute();
     }
-    private void sendPost(String email, String password) {
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_INDEX_EMAIL, mEmailComplite.getText().toString());
+        outState.putString(KEY_PASSWORD, mPassText.getText().toString());
+        outState.putString(KEY_PREFIX, strPrefix);
+        outState.putBoolean(KEY_ISOK, isOk);
+    }
+
+    private void sendPostRetrofit() {
+        JSONObject paraObject = new JSONObject();
         try {
-            JSONObject paraObject = new JSONObject();
-            try {
-                paraObject.put("login","trerewrrrqew");
-                paraObject.put("password", "444444444444444444432errew");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            mAPIService.savePost(paraObject.getString("login"),paraObject.getString("password")).enqueue(new Callback<Post>() {
-                @Override
-                public void onResponse(Call<Post> call, Response<Post> response) {
-                    if (response.code()==200) {
-                        Toast.makeText(LoginActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
-                    } else {
-                        try {
-                            JSONObject jObjError = new JSONObject(response.errorBody().string());
-                            Toast.makeText(LoginActivity.this, jObjError.getString("message"), Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Post> call, Throwable t) {
-
-                }
-            });
+            paraObject.put("login", "131w74rewre54454weqwee3211r2uu");
+            paraObject.put("password", mPassText.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        mAPIService.savePost(paraObject.toString()).enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(Call<Post> call, Response<Post> response) {
+                if (response.isSuccessful()) {
+                    saveArrayList(response.body().getData());
+                    Toast.makeText(LoginActivity.this, "Sign up complete", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Post> call, Throwable t) {
+                Log.e("e", "Unable to submit post to API.");
+            }
+        });
     }
 
     private void completeEmail(Editable s) {
-        if (Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
+            mEmailComplite.setError("Wrong email!");
+            isOk = false;
+        } else {
             mEmailComplite.setError(null);
         }
 
-        str = s.toString();
+        String str = s.toString();
+
 
         int atSignPosition = str.indexOf("@");
         if (atSignPosition == -1) {
             if (!isPrefixValid(str)) {
+                isOk = false;
                 mEmailComplite.setError("You can only use letters, numbers, periods (‘.’), and underscores (‘_’),(‘-’) in your username.");
             }
-        } else if (atSignPosition > 1 && atSignPosition < (str.length() + 1)) {
+            strPrefix = str;
+        } else if (atSignPosition < (str.length() + 1)) {
+            strPrefix = str.substring(0, atSignPosition);
+            if (strPrefix.length() > 0) {
+                if (!isPrefixValid(strPrefix)) {
+                    isOk = false;
+                    mEmailComplite.setError("You can only use letters, numbers, periods (‘.’), and underscores (‘_’),(‘-’) in your username.");
+                } else {
+                    strPrefix = str.substring(0, atSignPosition + 1);
+                    list = new ArrayList<>();
+                    for (String domain : domains) {
+                        String option = strPrefix + domain;
+                        if (option.startsWith(s.toString())) {
+                            list.add(option);
+                        }
+                    }
 
-            String prefix = str.substring(0, atSignPosition);
-            if (!isPrefixValid(prefix)) {
-                mEmailComplite.setError("You can only use letters, numbers, periods (‘.’), and underscores (‘_’),(‘-’) in your username.");
-            } else {
-                prefix = str.substring(0, atSignPosition + 1);
-                list = new ArrayList<>();
-                for (String domain : domains) {
-                    String option = prefix + domain;
-                    if (option.startsWith(s.toString())) {
-                        list.add(option);
+                    String postfix = str.substring(atSignPosition + 1, s.length());
+                    if (!isDomainValid(postfix)) {
+                        isOk = false;
+                        mEmailComplite.setError("Check your domain name. You can only use letters and periods (‘.’) in your domain.");
+                    } else {
+                        if (isNetworkAvailable()) {
+                            NetworkUrl networkUrl = new NetworkUrl();
+                            networkUrl.execute(postfix);
+                        } else {
+                            new android.app.AlertDialog.Builder(LoginActivity.this)
+                                    .setTitle("Network needed")
+                                    .setMessage("This app needs any network connection!")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            return;
+                                        }
+                                    })
+                                    .create()
+                                    .show();
+                        }
                     }
                 }
-            }
-            String postfix = str.substring(atSignPosition + 1, s.length());
-            if (!isDomainValid(postfix)) {
-                mEmailComplite.setError("Check your domain name. You can only use letters and periods (‘.’) in your domain.");
+
             } else {
-                if (isNetworkAvailable()) {
-                    NetworkUrl networkUrl = new NetworkUrl();
-                    networkUrl.execute(postfix);
-                } else {
-                    new android.app.AlertDialog.Builder(LoginActivity.this)
-                            .setTitle("Network needed")
-                            .setMessage("This app needs any network connection!")
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    return;
-                                }
-                            })
-                            .create()
-                            .show();
-                }
+                isOk = false;
+                mEmailComplite.setError("Your user name is empty!");
             }
         }
         mEmailComplite.setAdapter(new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, list));
@@ -313,6 +380,16 @@ public class LoginActivity extends AppCompatActivity {
         return false;
     }
 
+    public void saveArrayList(Object obj) {
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(obj);
+        SharedPreferences appSharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this.getApplicationContext());
+        SharedPreferences.Editor prefsEditor = appSharedPrefs.edit();
+        prefsEditor.putString("MyObject", jsonString);
+        prefsEditor.apply();
+    }
+
     private class NetworkUrl extends AsyncTask<String, Void, Boolean> {
 
         @Override
@@ -338,6 +415,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean aBoolean) {
             if (!aBoolean) {
                 mEmailComplite.setError("Domain not found");
+                isOk = false;
             } else {
                 isOk = true;
             }

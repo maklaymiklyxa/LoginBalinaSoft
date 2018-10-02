@@ -12,15 +12,14 @@ import okhttp3.Response;
 
 public class PostOkHttp extends AsyncTask<String, String, String> {
 
-    private String url;
+    private static final String url = "http://junior.balinasoft.com/api/account/signup";
     private String json;
     private OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
 
-    public PostOkHttp(String url, String json) {
-        this.url = url;
+    public PostOkHttp(String json) {
         this.json = json;
     }
 
@@ -35,17 +34,12 @@ public class PostOkHttp extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected String doInBackground(String[] params) {
+    protected String doInBackground(String... params) {
         try {
             return doPostRequest();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
     }
 }
