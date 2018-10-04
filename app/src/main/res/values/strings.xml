@@ -6,4 +6,25 @@
     <string name="emailHint">email@somedomain.com</string>
     <string name="passHint">enter password</string>
     <string name="signUp">Sign Up</string>
+
+    <string name="fieldEmpty">Field can not be empty!</string>
+
+    <string name="domainCheck">Check your domain name. You can only use letters and periods (‘.’) in your domain.</string>
+    <string name="domainEmpty">Domain is empty!</string>
+    <string name="domainError">Domain not found!</string>
+
+    <string name="passLength">Enter 8 or more symbols!</string>
+
+    <string name="emailCheck">You can only use letters, numbers and underscores (‘_’),(‘-’) in your username.</string>
+    <string name="emailWrong">Wrong email!</string>
+    <string name="emailUser">User name is empty!</string>
+
+    <string name="dialogTitle">Network needed</string>
+    <string name="dialogMessage">This app needs any network connection!</string>
+    <string name="dialogOk">OK</string>
+
+    <string name="signUpComplete">Sign up complete</string>
+    <string name="nameExists">This name already exists</string>
+
+
 </resources>

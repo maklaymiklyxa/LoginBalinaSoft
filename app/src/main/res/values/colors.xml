@@ -6,4 +6,6 @@
     <color name="starColor">#0ac4ba</color>
     <color name="centerColor">#2bda8e</color>
     <color name="colorHint">#aad2ed</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorAlert">#313030</color>
 </resources>
